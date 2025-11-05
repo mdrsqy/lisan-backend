@@ -1,6 +1,7 @@
 const userModel = require('../models/userModel');
 const bcrypt = require('bcryptjs');
 
+// CREATE
 const createUser = async (req, res) => {
   const { name, username, email, password, role } = req.body;
   if (!name || !username || !email || !password || !role) {
@@ -22,6 +23,7 @@ const createUser = async (req, res) => {
   }
 };
 
+// PRINT
 const getUsers = async (req, res) => {
   try {
     const users = await userModel.getUsers();
@@ -31,6 +33,7 @@ const getUsers = async (req, res) => {
   }
 };
 
+// SEARCH
 const searchUsers = async (req, res) => {
   const searchTerm = req.query.searchTerm;
 
@@ -51,25 +54,24 @@ const searchUsers = async (req, res) => {
   }
 };
 
+// DELETE
 const deleteUser = async (req, res) => {
   const { userId } = req.params;
-
   try {
     const result = await userModel.deleteUser(userId);
-
     if (result.message === 'User tidak ditemukan!') {
-      return res.status(404).json({ message: 'User tidak ditemukan!' });
+      return res.status(404).json({ message: result.message });
     }
-
     res.status(200).json(result);
   } catch (err) {
     res.status(500).json({ message: 'Gagal menghapus user, coba lagi!', error: err.message });
   }
 };
 
+// UPDATE
 const updateUser = async (req, res) => {
   const { userId } = req.params;
-  const { name, username, email, role } = req.body;
+  const { name, username, email, role } = req.body; 
 
   if (!name || !username || !email || !role) {
     return res.status(400).json({ message: 'Semua kolom harus diisi!' });
@@ -77,12 +79,8 @@ const updateUser = async (req, res) => {
 
   try {
     const result = await userModel.updateUser(userId, name, username, email, role);
-
-    if (result.message === 'Tidak ada perubahan yang dilakukan pada user!') {
-      return res.status(400).json(result);
-    }
-
     res.status(200).json(result);
+
   } catch (err) {
     res.status(500).json({ message: 'Gagal memperbarui user, coba lagi!', error: err.message });
   }
